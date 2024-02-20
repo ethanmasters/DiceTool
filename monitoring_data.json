@@ -1,0 +1,12 @@
+{
+    "total_full_frame_photos": 5,
+    "total_cropped_dice_photos": 18,
+    "dice_face_counts": {
+        "1": 3,
+        "2": 4,
+        "3": 3,
+        "4": 3,
+        "5": 0,
+        "6": 5
+    }
+}

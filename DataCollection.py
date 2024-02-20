@@ -6,6 +6,7 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import simpledialog
 from PIL import Image, ImageTk
+import json
 
 
 # Function to reset the snapshot
@@ -103,6 +104,8 @@ def collect_screenshot_data(full_frame, regions, bounding_boxes, dataset_dir="Da
     for i, bounding_box in enumerate(bounding_boxes):
         xml_path = os.path.join(annotations_dir_path, f"image_{timestamp}_dice_{i + 1}.xml")
         save_bounding_box_xml(xml_path, f"image_{timestamp}_dice_{i + 1}.png", bounding_box, annotations[i])
+        
+    update_monitoring_data(1, len(regions), annotations)
 
     print(f"Saved full frame, {len(regions)} isolated regions, and annotations for the current frame.")
 
@@ -134,6 +137,23 @@ def save_bounding_box_xml(xml_path, filename, bounding_box, annotation):
 
     tree = ET.ElementTree(root)
     tree.write(xml_path)
+
+def update_monitoring_data(new_full_frame_photos, new_cropped_dice_photos, new_dice_values, file_path='monitoring_data.json'):
+    # Read the current data
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    
+    # Update the data
+    data['total_full_frame_photos'] += new_full_frame_photos
+    data['total_cropped_dice_photos'] += new_cropped_dice_photos
+    for value in new_dice_values:
+        value_str = str(value)  # Ensure the key is a string
+        if value_str in data['dice_face_counts']:
+            data['dice_face_counts'][value_str] += 1
+
+    # Save the updated data back to the file
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)
 
 # Capture video from the camera (0 is usually the default camera)
 cap = cv2.VideoCapture(0)
